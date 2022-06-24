@@ -90,7 +90,7 @@ class App : Application() {
 
 代码中加了注释，直接看代码吧
 核心实现：<https://github.com/ibaozi-cn/mmipc/tree/main/mmipc/src/main/cpp>  
-欢迎加微信交流，预计下周也就是7月2号，会以直播的形式分享该组件的前后开发历程
+欢迎加微信交流，预计本周也就是6月25号，会以直播的形式分享该组件的前后开发历程
 ![img.png](ibaozi_cn.png)
 
 ## 参考
