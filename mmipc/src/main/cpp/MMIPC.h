@@ -23,23 +23,23 @@ class MMIPC {
 
 public:
     ~MMIPC() { doCleanMemoryCache(true); }
-    //
+    //清理缓存
     void doCleanMemoryCache(bool forceClean);
-
+    //打开文件
     bool open();
-
+    //关闭文件
     void close();
-
+    //刷新文件大小
     bool truncate(size_t size);
-
+    // mmap 映射
     bool mmap();
-
+    // 支持重新加载mmap
     void reloadMmap(const string &path);
-
+    // 增量更新数据
     void setData(const string &key, const string &value);
-
+    // 获取缓存数据
     string getData(const string &key, const string &value);
-
+    // 判断文件链接是否正常
     bool isFileValid() { return m_fd >= 0; }
 };
 
