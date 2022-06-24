@@ -87,7 +87,8 @@ class App : Application() {
 ```
 
 ### 部门源码分析
-待补
+
+代码中加了注释，直接看代码吧
 
 ## 参考
 <https://github.com/Tencent/MMKV>  
