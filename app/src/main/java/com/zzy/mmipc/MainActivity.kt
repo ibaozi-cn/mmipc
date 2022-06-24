@@ -1,8 +1,10 @@
 package com.zzy.mmipc
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.zzy.mmipc.ui.main.MainFragment
 import java.io.File
 
@@ -16,8 +18,13 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-        val path: String = this.externalCacheDir!!.absolutePath + File.separator + "mmipc.arsc"
-        Log.d("MMIPC->",path);
-        NativeLib().initMMAP(path)
+        "set data".print(getProcessName())
+        App.mmipc.setData("1", "2")
+        App.mmipc.setData("3", "4")
     }
+
+    fun startOtherProcessActivity(view: View) {
+        startActivity(Intent(this, OtherProcessActivity::class.java))
+    }
+
 }

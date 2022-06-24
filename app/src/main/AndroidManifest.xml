@@ -3,12 +3,17 @@
     package="com.zzy.mmipc">
 
     <application
-        android:allowBackup="true"
+        android:name=".App"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MMIPC">
+        <activity
+            android:name=".OtherProcessActivity"
+            android:exported="true"
+            android:process=":childProcess" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
