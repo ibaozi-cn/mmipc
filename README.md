@@ -87,6 +87,6 @@ class App : Application() {
 待补
 
 ## 参考
-<https://github.com/Tencent/MMKV>
-<https://mp.weixin.qq.com/s/YjwxeLCwvJxXn7HPOF4Ayw>
+<https://github.com/Tencent/MMKV>  
+<https://mp.weixin.qq.com/s/YjwxeLCwvJxXn7HPOF4Ayw>  
 <https://mp.weixin.qq.com/s/xTKQjb45gzRIUjKzSBOKsg>
