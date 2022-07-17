@@ -91,9 +91,6 @@ bool MMIPC::truncate(size_t size) {
     }
     auto oldSize = m_size;
     m_size = size;
-    if (m_size < default_mmap_size || (m_size % default_mmap_size != 0)) {
-        m_size = ((m_size / default_mmap_size) + 1) * default_mmap_size;
-    }
     if (::ftruncate(m_fd, static_cast<off_t>(m_size)) != 0) {
         ALOGE("truncate failed [%s] to size %zu, %s", m_path.c_str(), m_size, strerror(errno));
         m_size = oldSize;
@@ -120,7 +117,7 @@ bool MMIPC::truncate(size_t size) {
 }
 
 bool MMIPC::mmap() {
-    m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
+    m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS, m_fd, 0);
     if (m_ptr == MAP_FAILED) {
         ALOGD("mmap failed");
         m_ptr = nullptr;
