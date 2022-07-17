@@ -10,15 +10,10 @@ import android.content.Context
 
 class App : Application() {
 
-    companion object {
-        var mmipc: MMIPC = MMIPC()
-    }
-
     override fun onCreate() {
         super.onCreate()
-        val path: String = this.externalCacheDir!!.absolutePath + File.separator + "mmipc.arsc"
         "init".print(getProcessName())
-        mmipc.initMMAP(path)
+        MMIPC.initMMAP(this)
     }
 }
 

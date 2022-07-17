@@ -12,6 +12,8 @@ using namespace std;
 #ifndef MMIPC_MMIPC_H
 #define MMIPC_MMIPC_H
 
+constexpr auto FILE_SEPARATOR = "/";
+constexpr auto DEFAUL_IPC_FILE = "default_mmap.ipc";
 
 class MMIPC {
     int m_fd = -1;
@@ -34,13 +36,15 @@ public:
 
     bool mmap();
 
-    void reloadMmap(const string &path);
+    void reloadMmap(const string &dir);
 
     void setData(const string &key, const string &value);
 
     string getData(const string &key, const string &value);
 
     bool isFileValid() { return m_fd >= 0; }
+
+    static string getDefaultIpcFilePath(const string &dir);
 };
 
 

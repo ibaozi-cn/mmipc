@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
         "set data".print(getProcessName())
-        App.mmipc.setData("1", "2")
-        App.mmipc.setData("3", "4")
+        MMIPC.setData("1", "2")
+        MMIPC.setData("3", "4")
     }
 
     fun startOtherProcessActivity(view: View) {

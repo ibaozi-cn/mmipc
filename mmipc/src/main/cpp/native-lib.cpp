@@ -5,19 +5,9 @@
 static MMIPC *mmipc = nullptr;
 
 extern "C"
-JNIEXPORT jstring
-JNICALL
-Java_com_zzy_mmipc_MMIPC_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
-}
-
-extern "C"
 JNIEXPORT void
 JNICALL
-Java_com_zzy_mmipc_MMIPC_initMMAP(JNIEnv *env, jobject thiz, jstring root_dir) {
+Java_com_zzy_mmipc_MMIPC_initMMAPJNI(JNIEnv *env, jobject thiz, jstring root_dir) {
     const char *dir = env->GetStringUTFChars(root_dir, nullptr);
     ALOGD("open file %s", dir);
     mmipc = new MMIPC();
@@ -25,7 +15,7 @@ Java_com_zzy_mmipc_MMIPC_initMMAP(JNIEnv *env, jobject thiz, jstring root_dir) {
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_zzy_mmipc_MMIPC_setData(JNIEnv *env, jobject thiz, jstring key, jstring value) {
+Java_com_zzy_mmipc_MMIPC_setDataJNI(JNIEnv *env, jobject thiz, jstring key, jstring value) {
     const char *keyStr = env->GetStringUTFChars(key, nullptr);
     const char *valueStr = env->GetStringUTFChars(value, nullptr);
     if (mmipc) {
@@ -34,7 +24,7 @@ Java_com_zzy_mmipc_MMIPC_setData(JNIEnv *env, jobject thiz, jstring key, jstring
 }
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_zzy_mmipc_MMIPC_getData(JNIEnv *env, jobject thiz, jstring key, jstring defaultValue) {
+Java_com_zzy_mmipc_MMIPC_getDataJNI(JNIEnv *env, jobject thiz, jstring key, jstring defaultValue) {
     const char *keyStr = env->GetStringUTFChars(key, nullptr);
     const char *defaultValueStr = env->GetStringUTFChars(defaultValue, nullptr);
     if (mmipc) {

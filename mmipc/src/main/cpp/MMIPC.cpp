@@ -14,8 +14,8 @@ extern size_t getPageSize();
 
 extern bool zeroFillFile(int fd, size_t startPos, size_t size);
 
-void MMIPC::reloadMmap(const string &path) {
-    m_path = path;
+void MMIPC::reloadMmap(const string &dir) {
+    m_path = getDefaultIpcFilePath(dir);
     if (isFileValid()) {
         doCleanMemoryCache(false);
     }
@@ -117,7 +117,7 @@ bool MMIPC::truncate(size_t size) {
 }
 
 bool MMIPC::mmap() {
-    m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS, m_fd, 0);
+    m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, m_fd, 0);
     if (m_ptr == MAP_FAILED) {
         ALOGD("mmap failed");
         m_ptr = nullptr;
@@ -139,6 +139,10 @@ void MMIPC::doCleanMemoryCache(bool forceClean) {
     m_ptr = nullptr;
     close();
     m_size = 0;
+}
+
+string MMIPC::getDefaultIpcFilePath(const string &dir) {
+    return dir + FILE_SEPARATOR + DEFAUL_IPC_FILE;
 }
 
 bool getFileSize(int fd, size_t &size) {

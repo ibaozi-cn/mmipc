@@ -7,6 +7,6 @@ class OtherProcessActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_process)
-        App.mmipc.getData().print(getProcessName())
+        MMIPC.getData().print(getProcessName())
     }
 }
