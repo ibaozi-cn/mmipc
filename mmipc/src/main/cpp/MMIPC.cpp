@@ -12,26 +12,24 @@ extern bool getFileSize(int fd, size_t &size);
 
 extern size_t getPageSize();
 
-extern bool zeroFillFile(int fd, size_t startPos, size_t size);
-
 void MMIPC::reloadMmap(const string &dir) {
+    pid_t pid = getpid();
+    ALOGE("pid[%d]", pid);
     m_path = getDefaultIpcFilePath(dir);
     if (isFileValid()) {
         doCleanMemoryCache(false);
     }
-    default_mmap_size = getPageSize();
+    // 一般一个缓存页4k，乘以1024，4M
+    default_mmap_size = getPageSize() * 1024 - (4096 * 8);
     if (!open()) {
         ALOGD("fail to open [%s], %d(%s)", m_path.c_str(), errno, strerror(errno));
     } else {
         getFileSize(m_fd, m_size);
-        if (m_size < default_mmap_size || (m_size % default_mmap_size != 0)) {
-            size_t roundSize = (m_size / default_mmap_size + 1) * default_mmap_size;
-            truncate(roundSize);
+        ALOGD("getFileSize m_size %zu, default_mmap_size %zu", m_size, default_mmap_size);
+        if (m_size != default_mmap_size) {
+            truncate(default_mmap_size);
         } else {
-            auto ret = mmap();
-            if (!ret) {
-                doCleanMemoryCache(true);
-            }
+           MMIPC::mmap();
         }
     }
 }
@@ -86,9 +84,6 @@ bool MMIPC::truncate(size_t size) {
     if (!isFileValid()) {
         return false;
     }
-    if (size == m_size) {
-        return true;
-    }
     auto oldSize = m_size;
     m_size = size;
     if (::ftruncate(m_fd, static_cast<off_t>(m_size)) != 0) {
@@ -96,28 +91,11 @@ bool MMIPC::truncate(size_t size) {
         m_size = oldSize;
         return false;
     }
-    if (oldSize > m_size) {
-        if (!zeroFillFile(m_fd, oldSize, m_size - oldSize)) {
-            ALOGE("zeroFile fail [%s] to size %zu, %s", m_path.c_str(), m_size,
-                  strerror(errno));
-            m_size = oldSize;
-            return false;
-        }
-    }
-    if (m_ptr) {
-        if (munmap(m_ptr, oldSize) != 0) {
-            ALOGE("munmap fail [%s], %s", m_path.c_str(), strerror(errno));
-        }
-    }
-    auto ret = mmap();
-    if (!ret) {
-        doCleanMemoryCache(true);
-    }
-    return ret;
+    return MMIPC::mmap();
 }
 
 bool MMIPC::mmap() {
-    m_ptr = (char *) ::mmap(m_ptr, m_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, m_fd, 0);
+    m_ptr = (char *) ::mmap(m_ptr, default_mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
     if (m_ptr == MAP_FAILED) {
         ALOGD("mmap failed");
         m_ptr = nullptr;
@@ -157,32 +135,4 @@ bool getFileSize(int fd, size_t &size) {
 
 size_t getPageSize() {
     return static_cast<size_t>(getpagesize());
-}
-
-
-bool zeroFillFile(int fd, size_t startPos, size_t size) {
-    if (fd < 0) {
-        return false;
-    }
-
-    if (lseek(fd, static_cast<off_t>(startPos), SEEK_SET) < 0) {
-        ALOGE("lseek fail m_fd[%d], error:%s", fd, strerror(errno));
-        return false;
-    }
-
-    static const char zeros[4096] = {};
-    while (size >= sizeof(zeros)) {
-        if (write(fd, zeros, sizeof(zeros)) < 0) {
-            ALOGE("write fail m_fd[%d], error:%s", fd, strerror(errno));
-            return false;
-        }
-        size -= sizeof(zeros);
-    }
-    if (size > 0) {
-        if (write(fd, zeros, size) < 0) {
-            ALOGE("write fail m_fd[%d], error:%s", fd, strerror(errno));
-            return false;
-        }
-    }
-    return true;
 }
