@@ -24,9 +24,9 @@ void MMIPC::reloadMmap(const string &dir) {
     if (!open()) {
         ALOGD("fail to open [%s], %d(%s)", m_path.c_str(), errno, strerror(errno));
     } else {
-        getFileSize(m_fd, m_size);
-        ALOGD("getFileSize m_size %zu, default_mmap_size %zu", m_size, default_mmap_size);
-        if (m_size != default_mmap_size) {
+        getFileSize(m_fd, m_file_size);
+        ALOGD("getFileSize m_file_size %zu, default_mmap_size %zu", m_file_size, default_mmap_size);
+        if (m_file_size != default_mmap_size) {
             truncate(default_mmap_size);
         } else {
            MMIPC::mmap();
@@ -65,10 +65,10 @@ void MMIPC::setData(const string &key, const string &value) {
     }
     ALOGD("setData content=%s", content.c_str());
     size_t numberOfBytes = content.length();
-    if (m_position + numberOfBytes > m_size) {
+    if (m_position + numberOfBytes > m_file_size) {
         auto msg = "m_position: " + to_string(m_position) + ", numberOfBytes: " +
                    to_string(numberOfBytes) +
-                   ", m_size: " + to_string(m_size);
+                   ", m_file_size: " + to_string(m_file_size);
         throw out_of_range(msg);
     }
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
@@ -84,11 +84,11 @@ bool MMIPC::truncate(size_t size) {
     if (!isFileValid()) {
         return false;
     }
-    auto oldSize = m_size;
-    m_size = size;
-    if (::ftruncate(m_fd, static_cast<off_t>(m_size)) != 0) {
-        ALOGE("truncate failed [%s] to size %zu, %s", m_path.c_str(), m_size, strerror(errno));
-        m_size = oldSize;
+    auto oldSize = m_file_size;
+    m_file_size = size;
+    if (::ftruncate(m_fd, static_cast<off_t>(m_file_size)) != 0) {
+        ALOGE("truncate failed [%s] to size %zu, %s", m_path.c_str(), m_file_size, strerror(errno));
+        m_file_size = oldSize;
         return false;
     }
     return MMIPC::mmap();
@@ -110,13 +110,13 @@ void MMIPC::doCleanMemoryCache(bool forceClean) {
         return;
     }
     if (m_ptr && m_ptr != MAP_FAILED) {
-        if (munmap(m_ptr, m_size) != 0) {
+        if (munmap(m_ptr, m_file_size) != 0) {
             ALOGE("munmap fail [%s], %s", m_path.c_str(), strerror(errno));
         }
     }
     m_ptr = nullptr;
     close();
-    m_size = 0;
+    m_file_size = 0;
 }
 
 string MMIPC::getDefaultIpcFilePath(const string &dir) {

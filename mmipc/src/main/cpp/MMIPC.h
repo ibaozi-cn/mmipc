@@ -19,7 +19,7 @@ class MMIPC {
     int m_fd = -1;
     string m_path;
     char *m_ptr;
-    size_t m_size;
+    size_t m_file_size;
     size_t default_mmap_size;
     size_t m_position = 0;
 
