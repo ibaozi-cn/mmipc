@@ -94,8 +94,8 @@ bool MMIPC::truncate(size_t size) {
 bool MMIPC::mmap() {
     m_ptr = (char *) ::mmap(m_ptr, default_mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
     if (m_ptr == MAP_FAILED) {
+        doCleanMemoryCache(true);
         ALOGD("mmap failed");
-        m_ptr = nullptr;
         return false;
     }
     ALOGD("mmap success");
@@ -112,8 +112,11 @@ void MMIPC::doCleanMemoryCache(bool forceClean) {
         }
     }
     m_ptr = nullptr;
-    close();
+    m_path = nullptr;
     m_file_size = 0;
+    m_position = 0;
+    default_mmap_size = 0;
+    close();
 }
 
 string MMIPC::getDefaultIpcFilePath(const string &dir) {
