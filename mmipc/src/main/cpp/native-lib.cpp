@@ -33,7 +33,6 @@ Java_com_zzy_mmipc_MMIPC_getDataJNI(JNIEnv *env, jobject thiz, jstring key, jstr
             ALOGD("getData empty by key%s", keyStr);
             dataStr = defaultValueStr;
         }
-        ALOGD("getData result by key=%s", dataStr.c_str());
         return env->NewStringUTF(dataStr.c_str());
     }
 }

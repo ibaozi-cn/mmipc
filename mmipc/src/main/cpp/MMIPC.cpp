@@ -29,7 +29,7 @@ void MMIPC::reloadMmap(const string &dir) {
         if (m_file_size != default_mmap_size) {
             truncate(default_mmap_size);
         } else {
-           MMIPC::mmap();
+            MMIPC::mmap();
         }
     }
 }
@@ -59,10 +59,7 @@ void MMIPC::close() {
 }
 
 void MMIPC::setData(const string &key, const string &value) {
-    string content = key + ":" + value;
-    if (m_position != 0) {
-        content = "," + content;
-    }
+    string content = key + ":" + value + ",";
     ALOGD("setData content=%s", content.c_str());
     size_t numberOfBytes = content.length();
     if (m_position + numberOfBytes > m_file_size) {
@@ -71,9 +68,9 @@ void MMIPC::setData(const string &key, const string &value) {
                    ", m_file_size: " + to_string(m_file_size);
         throw out_of_range(msg);
     }
+    m_position = strlen(m_ptr);
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
-    m_position += numberOfBytes;
-    ALOGD("setData success m_ptr=%s", m_ptr);
+    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
 }
 
 string MMIPC::getData(const string &key, const string &value) {
