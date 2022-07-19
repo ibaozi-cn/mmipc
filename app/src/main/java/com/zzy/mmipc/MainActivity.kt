@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.View
 import com.zzy.mmipc.ui.main.MainFragment
 import java.io.File
+import java.sql.Time
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,12 +21,30 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
         "set data".print(getProcessName())
-        MMIPC.setData("1", "2")
-        MMIPC.setData("3", "4")
+        Thread {
+            var index = 10000
+            repeat(5000) {
+                index++
+                MMIPC.setData(index.toString(), index.toString())
+            }
+        }.start()
+        Thread {
+            var index = 20000
+            repeat(5000) {
+                index++
+                MMIPC.setData(index.toString(), index.toString())
+            }
+        }.start()
+        startActivity(Intent(this, OtherProcessActivity::class.java))
     }
 
     fun startOtherProcessActivity(view: View) {
         startActivity(Intent(this, OtherProcessActivity::class.java))
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        MMIPC.getData("3", "4")
     }
 
 }
