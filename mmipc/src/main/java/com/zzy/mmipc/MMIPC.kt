@@ -1,6 +1,8 @@
 package com.zzy.mmipc
 
 import android.app.Application
+import android.os.Handler
+import android.os.HandlerThread
 import java.lang.Exception
 
 class MMIPC private constructor() {
@@ -18,6 +20,14 @@ class MMIPC private constructor() {
         // Used to load the 'mmipc' library on application startup.
         val mmipc = MMIPC()
 
+        private val handlerThread by lazy {
+            HandlerThread("THREAD-MMIPC").apply { start() }
+        }
+
+        private val workHandler by lazy {
+            Handler(handlerThread.looper)
+        }
+
         init {
             System.loadLibrary("mmipc")
         }
@@ -33,7 +43,9 @@ class MMIPC private constructor() {
 
         fun setData(key: String, value: String = "") {
             try {
-                mmipc.setDataJNI(key, value)
+                workHandler.post {
+                    mmipc.setDataJNI(key, value)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

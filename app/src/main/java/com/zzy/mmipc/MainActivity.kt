@@ -3,6 +3,8 @@ package com.zzy.mmipc
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import com.zzy.mmipc.ui.main.MainFragment
 import java.util.concurrent.CountDownLatch
@@ -17,7 +19,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-        startActivity(Intent(this, OtherProcessActivity::class.java))
+//        startActivity(Intent(this, OtherProcessActivity::class.java))
     }
 
     override fun onResume() {
@@ -45,7 +47,9 @@ class MainActivity : AppCompatActivity() {
             countDownLatch.countDown()
         }.start()
         countDownLatch.await()
-        MMIPC.getData("").length.toString().print(getProcessName())
+        Handler(Looper.getMainLooper()).postDelayed({
+            MMIPC.getData("").length.toString().print(getProcessName())
+        }, 5000)
     }
 
     fun startOtherProcessActivity(view: View) {
