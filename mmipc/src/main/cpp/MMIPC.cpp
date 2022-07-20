@@ -3,6 +3,7 @@
 //
 
 #include <cerrno>
+#include <pthread.h>
 #include "MMIPC.h"
 #include "AndroidLog.h"
 
@@ -59,8 +60,9 @@ void MMIPC::close() {
 }
 
 void MMIPC::setData(const string &key, const string &value) {
+    pthread_mutex_lock(&m_lock);
     string content = key + ":" + value + ",";
-    ALOGD("setData content=%s", content.c_str());
+//    ALOGD("setData content=%s", content.c_str());
     size_t numberOfBytes = content.length();
     if (m_position + numberOfBytes > m_file_size) {
         auto msg = "m_position: " + to_string(m_position) + ", numberOfBytes: " +
@@ -70,7 +72,8 @@ void MMIPC::setData(const string &key, const string &value) {
     }
     m_position = strlen(m_ptr);
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
-    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
+//    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
+    pthread_mutex_unlock(&m_lock);
 }
 
 string MMIPC::getData(const string &key, const string &value) {

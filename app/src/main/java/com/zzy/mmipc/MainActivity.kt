@@ -9,6 +9,7 @@ import com.zzy.mmipc.ui.main.MainFragment
 import java.io.File
 import java.sql.Time
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,13 +21,20 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
+        testMMIPC()
+    }
+
+    private fun testMMIPC() {
+//        startActivity(Intent(this, OtherProcessActivity::class.java))
         "set data".print(getProcessName())
+        val countDownLatch = CountDownLatch(2)
         Thread {
             var index = 10000
             repeat(5000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
+            countDownLatch.countDown()
         }.start()
         Thread {
             var index = 20000
@@ -34,8 +42,10 @@ class MainActivity : AppCompatActivity() {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
+            countDownLatch.countDown()
         }.start()
-        startActivity(Intent(this, OtherProcessActivity::class.java))
+        countDownLatch.await()
+        MMIPC.getData("").length.toString().print(getProcessName())
     }
 
     fun startOtherProcessActivity(view: View) {

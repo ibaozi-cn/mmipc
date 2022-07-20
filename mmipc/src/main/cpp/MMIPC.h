@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string>
+#include <sys/file.h>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ class MMIPC {
     size_t m_file_size;
     size_t default_mmap_size;
     size_t m_position = 0;
+    pthread_mutex_t m_lock;
 
 public:
     ~MMIPC() { doCleanMemoryCache(true); }
