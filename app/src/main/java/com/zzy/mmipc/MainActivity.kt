@@ -21,16 +21,20 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
+        startActivity(Intent(this, OtherProcessActivity::class.java))
+    }
+
+    override fun onResume() {
+        super.onResume()
         testMMIPC()
     }
 
     private fun testMMIPC() {
-//        startActivity(Intent(this, OtherProcessActivity::class.java))
         "set data".print(getProcessName())
         val countDownLatch = CountDownLatch(2)
         Thread {
             var index = 10000
-            repeat(5000) {
+            repeat(10000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
@@ -38,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         }.start()
         Thread {
             var index = 20000
-            repeat(5000) {
+            repeat(10000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
