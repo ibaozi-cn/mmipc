@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-//        startActivity(Intent(this, OtherProcessActivity::class.java))
+        startActivity(Intent(this, OtherProcessActivity::class.java))
     }
 
     override fun onResume() {
@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
             countDownLatch.countDown()
         }.start()
         Thread {
-            var index = 20000
-            repeat(10000) {
+            var index = 10000
+            repeat(80000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }

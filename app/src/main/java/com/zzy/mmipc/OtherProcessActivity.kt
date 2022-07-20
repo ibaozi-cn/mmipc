@@ -12,15 +12,15 @@ class OtherProcessActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_other_process)
-//        testMMIPC()
+        testMMIPC()
     }
 
     private fun testMMIPC() {
-        MMIPC.getData().print(getProcessName())
+//        MMIPC.getData().print(getProcessName())
         val countDownLatch = CountDownLatch(2)
         Thread {
             var index = 30000
-            repeat(5000) {
+            repeat(30000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
@@ -28,7 +28,7 @@ class OtherProcessActivity : AppCompatActivity() {
         }.start()
         Thread {
             var index = 40000
-            repeat(5000) {
+            repeat(30000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
             }
