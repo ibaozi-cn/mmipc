@@ -3,12 +3,8 @@ package com.zzy.mmipc
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.zzy.mmipc.ui.main.MainFragment
-import java.io.File
-import java.sql.Time
-import java.util.*
 import java.util.concurrent.CountDownLatch
 
 class MainActivity : AppCompatActivity() {
@@ -26,10 +22,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        testMMIPC()
+        testMultiThreadWriteMMIPC()
     }
 
-    private fun testMMIPC() {
+    private fun testMultiThreadWriteMMIPC() {
         "set data".print(getProcessName())
         val countDownLatch = CountDownLatch(2)
         Thread {
