@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, MainFragment.newInstance())
                 .commitNow()
         }
-        startActivity(Intent(this, OtherProcessActivity::class.java))
+//        startActivity(Intent(this, OtherProcessActivity::class.java))
     }
 
     override fun onResume() {

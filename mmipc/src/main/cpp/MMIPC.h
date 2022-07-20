@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string>
 #include <sys/file.h>
+#include <pthread.h>
 
 using namespace std;
 
@@ -26,7 +27,10 @@ class MMIPC {
     pthread_mutex_t m_lock;
 
 public:
-    ~MMIPC() { doCleanMemoryCache(true); }
+    ~MMIPC() {
+        doCleanMemoryCache(true);
+        pthread_mutex_destroy(&m_lock);
+    }
 
     void doCleanMemoryCache(bool forceClean);
 
@@ -48,6 +52,5 @@ public:
 
     static string getDefaultIpcFilePath(const string &dir);
 };
-
 
 #endif //MMIPC_MMIPC_H
