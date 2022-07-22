@@ -59,7 +59,8 @@ void MMIPC::close() {
 }
 
 void MMIPC::setData(const string &key, const string &value) {
-    pthread_mutex_lock(&m_lock);
+//    pthread_mutex_lock(&m_lock);
+    AutoMutex autoMutex(mLock);
     string content = key + ":" + value + ",";
 //    ALOGD("setData content=%s", content.c_str());
     size_t numberOfBytes = content.length();
@@ -72,7 +73,7 @@ void MMIPC::setData(const string &key, const string &value) {
     m_position = strlen(m_ptr);
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
 //    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
-    pthread_mutex_unlock(&m_lock);
+//    pthread_mutex_unlock(&m_lock);
 }
 
 string MMIPC::getData(const string &key, const string &value) {

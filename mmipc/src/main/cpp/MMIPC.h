@@ -8,6 +8,7 @@
 #include <string>
 #include <sys/file.h>
 #include <pthread.h>
+#include "Mutex.h"
 
 using namespace std;
 
@@ -25,8 +26,10 @@ class MMIPC {
     size_t default_mmap_size;
     size_t m_position = 0;
     pthread_mutex_t m_lock;
+    Mutex mLock;
 
 public:
+
     ~MMIPC() {
         doCleanMemoryCache(true);
         pthread_mutex_destroy(&m_lock);
