@@ -5,26 +5,24 @@
 #include <cerrno>
 #include "MMIPC.h"
 #include "AndroidLog.h"
+#include "Configs.h"
 
 using namespace std;
 
-extern bool getFileSize(int fd, size_t &size);
-
-extern size_t getPageSize();
 
 void MMIPC::reloadMmap(const string &dir) {
     pid_t pid = getpid();
     ALOGE("pid[%d]", pid);
-    m_path = getDefaultIpcFilePath(dir);
+    m_path = configs::get_instance().getDefaultIpcFilePath();
     if (isFileValid()) {
         doCleanMemoryCache(false);
     }
     // 一般一个缓存页4k，乘以1024，4M
-    default_mmap_size = getPageSize() * 1024 - (4096 * 8);
+    default_mmap_size = configs::get_instance().getPageSize() * 1024 - (4096 * 8);
     if (!open()) {
         ALOGD("fail to open [%s], %d(%s)", m_path.c_str(), errno, strerror(errno));
     } else {
-        getFileSize(m_fd, m_file_size);
+        configs::get_instance().getFileSize(m_fd, m_file_size);
         ALOGD("getFileSize m_file_size %zu, default_mmap_size %zu", m_file_size, default_mmap_size);
         if (m_file_size != default_mmap_size) {
             truncate(default_mmap_size);
@@ -59,7 +57,6 @@ void MMIPC::close() {
 }
 
 void MMIPC::setData(const string &key, const string &value) {
-//    pthread_mutex_lock(&m_lock);
     AutoMutex autoMutex(mLock);
     string content = key + ":" + value + ",";
 //    ALOGD("setData content=%s", content.c_str());
@@ -73,7 +70,6 @@ void MMIPC::setData(const string &key, const string &value) {
     m_position = strlen(m_ptr);
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
 //    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
-//    pthread_mutex_unlock(&m_lock);
 }
 
 string MMIPC::getData(const string &key, const string &value) {
@@ -122,20 +118,3 @@ void MMIPC::doCleanMemoryCache(bool forceClean) {
     close();
 }
 
-string MMIPC::getDefaultIpcFilePath(const string &dir) {
-    return dir + FILE_SEPARATOR + DEFAUL_IPC_FILE;
-}
-
-bool getFileSize(int fd, size_t &size) {
-    struct stat st = {};
-    if (fstat(fd, &st) != -1) {
-        size = (size_t) st.st_size;
-        ALOGD("m_fd size[%d]", size);
-        return true;
-    }
-    return false;
-}
-
-size_t getPageSize() {
-    return static_cast<size_t>(getpagesize());
-}

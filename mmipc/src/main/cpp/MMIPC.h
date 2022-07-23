@@ -8,15 +8,12 @@
 #include <string>
 #include <sys/file.h>
 #include <pthread.h>
-#include "Mutex.h"
+#include "ShmMutex.h"
 
 using namespace std;
 
 #ifndef MMIPC_MMIPC_H
 #define MMIPC_MMIPC_H
-
-constexpr auto FILE_SEPARATOR = "/";
-constexpr auto DEFAUL_IPC_FILE = "default_mmap.ipc";
 
 class MMIPC {
     int m_fd = -1;
@@ -25,14 +22,13 @@ class MMIPC {
     size_t m_file_size;
     size_t default_mmap_size;
     size_t m_position = 0;
-    pthread_mutex_t m_lock;
-    Mutex mLock;
+    ShmMutex mLock;
 
 public:
 
     ~MMIPC() {
         doCleanMemoryCache(true);
-        pthread_mutex_destroy(&m_lock);
+
     }
 
     void doCleanMemoryCache(bool forceClean);
@@ -53,7 +49,8 @@ public:
 
     bool isFileValid() { return m_fd >= 0; }
 
-    static string getDefaultIpcFilePath(const string &dir);
 };
+
+typedef Singletion<MMIPC> mmipc;
 
 #endif //MMIPC_MMIPC_H
