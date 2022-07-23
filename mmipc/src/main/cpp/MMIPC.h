@@ -7,26 +7,33 @@
 #include <unistd.h>
 #include <string>
 #include <sys/file.h>
+#include <pthread.h>
+#include "ShmMutex.h"
 
 using namespace std;
 
 #ifndef MMIPC_MMIPC_H
 #define MMIPC_MMIPC_H
 
-constexpr auto FILE_SEPARATOR = "/";
-constexpr auto DEFAUL_IPC_FILE = "default_mmap.ipc";
-
 class MMIPC {
-    int m_fd = -1;
+    int m_fd;
     string m_path;
     char *m_ptr;
     size_t m_file_size;
     size_t default_mmap_size;
-    size_t m_position = 0;
-    pthread_mutex_t m_lock;
+    size_t m_position;
+    ShmMutex mLock;
 
 public:
-    ~MMIPC() { doCleanMemoryCache(true); }
+
+    // 一般一个缓存页4k，乘以1024，4M
+    MMIPC() : m_fd(-1), m_ptr(nullptr), m_file_size(0),
+              default_mmap_size(configs::get_instance().getPageSize() * 1024),m_position(0) {
+    }
+
+    ~MMIPC() {
+        doCleanMemoryCache(true);
+    }
 
     void doCleanMemoryCache(bool forceClean);
 
@@ -46,8 +53,8 @@ public:
 
     bool isFileValid() { return m_fd >= 0; }
 
-    static string getDefaultIpcFilePath(const string &dir);
 };
 
+typedef Singletion<MMIPC> mmipc;
 
 #endif //MMIPC_MMIPC_H
