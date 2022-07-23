@@ -106,7 +106,7 @@ inline void ShmMutex::createShmMutex(string dir) {
         //fail to close
         ALOGD("mutex fd close failed");
     }
-    memset(shmMutex, 0, sizeof(*shmMutex));
+    memset(shmMutex, 0, sizeof(struct shm_mutex));
     pthread_mutexattr_init(&shmMutex->mutexattr);
     pthread_mutexattr_setpshared(&shmMutex->mutexattr, PTHREAD_PROCESS_SHARED);
     pthread_mutex_init(&shmMutex->mutex, &shmMutex->mutexattr);
