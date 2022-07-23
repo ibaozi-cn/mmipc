@@ -16,19 +16,23 @@ using namespace std;
 #define MMIPC_MMIPC_H
 
 class MMIPC {
-    int m_fd = -1;
+    int m_fd;
     string m_path;
     char *m_ptr;
     size_t m_file_size;
     size_t default_mmap_size;
-    size_t m_position = 0;
+    size_t m_position;
     ShmMutex mLock;
 
 public:
 
+    // 一般一个缓存页4k，乘以1024，4M
+    MMIPC() : m_fd(-1), m_ptr(nullptr), m_file_size(0),
+              default_mmap_size(configs::get_instance().getPageSize() * 1024),m_position(0) {
+    }
+
     ~MMIPC() {
         doCleanMemoryCache(true);
-
     }
 
     void doCleanMemoryCache(bool forceClean);

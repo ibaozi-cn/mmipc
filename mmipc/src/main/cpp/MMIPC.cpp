@@ -17,8 +17,6 @@ void MMIPC::reloadMmap(const string &dir) {
     if (isFileValid()) {
         doCleanMemoryCache(false);
     }
-    // 一般一个缓存页4k，乘以1024，4M
-    default_mmap_size = configs::get_instance().getPageSize() * 1024 - (4096 * 8);
     if (!open()) {
         ALOGD("fail to open [%s], %d(%s)", m_path.c_str(), errno, strerror(errno));
     } else {
