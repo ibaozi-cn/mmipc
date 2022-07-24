@@ -20,6 +20,8 @@ void MMIPC::reloadMmap(const string &dir) {
     if (!open()) {
         ALOGD("fail to open [%s], %d(%s)", m_path.c_str(), errno, strerror(errno));
     } else {
+        m_file_lock = new FileLock(m_fd);
+        AutoFileLock autoFileLock(m_file_lock, ExclusiveLockType);
         configs::get_instance().getFileSize(m_fd, m_file_size);
         ALOGD("getFileSize m_file_size %zu, default_mmap_size %zu", m_file_size, default_mmap_size);
         if (m_file_size != default_mmap_size) {
@@ -55,7 +57,9 @@ void MMIPC::close() {
 }
 
 void MMIPC::setData(const string &key, const string &value) {
-    AutoMutex autoMutex(mLock);
+//    AutoMutex autoMutex(m_mutex_lock);
+    pthread_mutex_lock(&mutex);
+    AutoFileLock autoFileLock(m_file_lock, ExclusiveLockType);
     string content = key + ":" + value + ",";
 //    ALOGD("setData content=%s", content.c_str());
     size_t numberOfBytes = content.length();
@@ -68,6 +72,7 @@ void MMIPC::setData(const string &key, const string &value) {
     m_position = strlen(m_ptr);
     memcpy(m_ptr + m_position, (void *) content.c_str(), numberOfBytes);
 //    ALOGD("setData success m_ptr.len=%d", m_position + numberOfBytes);
+    pthread_mutex_unlock(&mutex);
 }
 
 string MMIPC::getData(const string &key, const string &value) {
@@ -114,5 +119,8 @@ void MMIPC::doCleanMemoryCache(bool forceClean) {
     m_position = 0;
     default_mmap_size = 0;
     close();
+    delete &m_mutex_lock;
+    delete m_file_lock;
+    pthread_mutex_destroy(&mutex);
 }
 

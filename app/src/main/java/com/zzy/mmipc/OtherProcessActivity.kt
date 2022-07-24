@@ -27,7 +27,7 @@ class OtherProcessActivity : AppCompatActivity() {
             countDownLatch.countDown()
         }.start()
         Thread {
-            var index = 40000
+            var index = 20000
             repeat(30000) {
                 index++
                 MMIPC.setData(index.toString(), index.toString())
