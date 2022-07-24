@@ -6,42 +6,63 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string>
+#include <sys/file.h>
+#include <pthread.h>
+#include "ShmMutex.h"
+#include "FileLock.h"
 
 using namespace std;
 
 #ifndef MMIPC_MMIPC_H
 #define MMIPC_MMIPC_H
 
-
 class MMIPC {
-    int m_fd = -1; // 文件句柄
-    string m_path; // 磁盘文件路径，最终保存的位置
-    char *m_ptr;    // mmap 内存数据
-    size_t m_size;  // mmap 内存数据大小
-    size_t default_mmap_size;   // 默认页缓存大小
-    size_t m_position = 0;  // 当前内存数据长度所在位置
+    int m_fd;
+    string m_path;
+    char *m_ptr;
+    size_t m_file_size;
+    size_t default_mmap_size;
+    size_t m_position;
+    ShmMutex m_mutex_lock;
+    FileLock *m_file_lock;
+    pthread_mutex_t mutex;
 
 public:
-    ~MMIPC() { doCleanMemoryCache(true); }
-    //清理缓存
+
+    // 一般一个缓存页4k，乘以1024，4M
+    MMIPC() : m_fd(-1), m_ptr(nullptr), m_file_size(0),
+              default_mmap_size(configs::get_instance().getPageSize() * 1024),m_position(0){
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+        pthread_mutex_init(&mutex, &attr);
+        pthread_mutexattr_destroy(&attr);
+    }
+
+    ~MMIPC() {
+        doCleanMemoryCache(true);
+    }
+
     void doCleanMemoryCache(bool forceClean);
-    //打开文件
+
     bool open();
-    //关闭文件
+
     void close();
-    //刷新文件大小
+
     bool truncate(size_t size);
-    // mmap 映射
+
     bool mmap();
-    // 支持重新加载mmap
-    void reloadMmap(const string &path);
-    // 增量更新数据
+
+    void reloadMmap(const string &dir);
+
     void setData(const string &key, const string &value);
-    // 获取缓存数据
+
     string getData(const string &key, const string &value);
-    // 判断文件链接是否正常
+
     bool isFileValid() { return m_fd >= 0; }
+
 };
 
+typedef Singletion<MMIPC> mmipc;
 
 #endif //MMIPC_MMIPC_H

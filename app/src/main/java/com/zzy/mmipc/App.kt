@@ -2,23 +2,20 @@ package com.zzy.mmipc
 
 import android.app.Application
 import android.util.Log
-import java.io.File
 import android.app.ActivityManager
-import android.app.ActivityManager.RunningAppProcessInfo
 import android.content.Context
+import android.os.Build
+import java.io.File
+import java.nio.file.Files
+import kotlin.io.path.Path
 
 
 class App : Application() {
 
-    companion object {
-        var mmipc: MMIPC = MMIPC()
-    }
-
     override fun onCreate() {
         super.onCreate()
-        val path: String = this.externalCacheDir!!.absolutePath + File.separator + "mmipc.arsc"
         "init".print(getProcessName())
-        mmipc.initMMAP(path)
+        MMIPC.initMMAP(this)
     }
 }
 

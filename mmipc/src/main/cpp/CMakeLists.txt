@@ -24,6 +24,10 @@ add_library( # Sets the name of the library.
         native-lib.cpp
         MMIPC.h
         MMIPC.cpp
+        ShmMutex.h
+        Singletion.h
+        Configs.h
+        FileLock.h
         )
 
 # Searches for a specified prebuilt library and stores the path as a
